@@ -16,7 +16,9 @@ public class BucketSort {
 
     public static void main(String[] args) {
         // TODO: Implement negative doubles and small values ie -> 0.1
-        ArrayList<ArrayList<Double>> buckets = new ArrayList<ArrayList<Double>>();
+        // I think its complete!
+        ArrayList<ArrayList<Double>> posBucket = new ArrayList<ArrayList<Double>>();
+        ArrayList<ArrayList<Double>> negBucket = new ArrayList<ArrayList<Double>>();
 
         ArrayList<Double> inputData = new ArrayList<Double>();
 		BufferedReader stdIn = new BufferedReader(new InputStreamReader (System.in));
@@ -32,35 +34,53 @@ public class BucketSort {
 			System.out.println("BAD DATA");
 		}
 
-        sort(buckets, inputData);
+        sort(posBucket, negBucket, inputData);
     }
 
-    public static void sort(ArrayList<ArrayList<Double>> buckets, ArrayList<Double> inputData) {
-        for (int i = 0; i < inputData.size(); i++) {
-            buckets.add(new ArrayList<Double>());
-        }
-
-        double theMax = calculateMax(inputData);
-        double integerPart = Math.floor(theMax);
-        double divider = Math.ceil((integerPart + 1) / buckets.size());
-        int floor = 0;
+    public static void sort(ArrayList<ArrayList<Double>> posBucket, ArrayList<ArrayList<Double>> negBucket, ArrayList<Double> inputData) {
+        ArrayList<Double> negList = new ArrayList<Double>();
+        ArrayList<Double> posList = new ArrayList<Double>(); // zero in here too
 
         for (int i = 0; i < inputData.size(); i++) {
-            floor = (int)Math.floor(inputData.get(i)/divider);
-            buckets.get(floor).add(inputData.get(i));
-        }
-
-        for (int i = 0; i < buckets.size(); i++) {
-            if (buckets.get(i).size() != 0) {
-                insertSort(buckets.get(i));
+            if (inputData.get(i) < 0) {
+                negList.add(inputData.get(i));
+            } else {
+                posList.add(inputData.get(i));
             }
         }
 
+        for (int i = 0; i < negList.size(); i++) {
+            negBucket.add(new ArrayList<Double>());
+        }
+
+        for (int i = 0; i < posList.size(); i++) {
+            posBucket.add(new ArrayList<Double>());
+        }
+
+        sortPos(posBucket, posList);
+        sortNeg(negBucket, negList);
+
+
         ArrayList<Double> finalArray = new ArrayList<Double>();
-        for (int i = 0; i < buckets.size(); i++) {
-            if (buckets.get(i).size() != 0) {
-                for (int j = 0; j < buckets.get(i).size(); j++) {
-                    inputData.set(i, buckets.get(i).get(j));
+
+        // TODO: negatives are sorted but from the back. Insert them into the
+        // original list. Positives are sorted. insert them into the original
+        // list. I think its complete!
+
+        int negIndex = 0;
+        for (int i = negBucket.size() - 1; i > -1; i--) {
+            if (negBucket.get(i).size() != 0) {
+                for (int j = negBucket.get(i).size() - 1; j > -1; j--) {
+                    finalArray.add(negBucket.get(i).get(j));
+                    inputData.set(negIndex++, negBucket.get(i).get(j));
+                }
+            }
+        }
+
+        for (int i = 0; i < posBucket.size(); i++) {
+            if (posBucket.get(i).size() != 0) {
+                for (int j = 0; j < posBucket.get(i).size(); j++) {
+                    inputData.set(negIndex++, posBucket.get(i).get(j));
                 }
             }
         }
@@ -69,12 +89,49 @@ public class BucketSort {
         System.out.println(Arrays.toString(inputData.toArray()));
     }
 
-    public static double calculateMax(ArrayList<Double> inputData) {
+    public static void sortPos(ArrayList<ArrayList<Double>> posBucket, ArrayList<Double> posList) {
+        double theMax = calculateMax(posList);
+        double integerPart = Math.floor(theMax);
+        double divider = Math.ceil((integerPart + 1) / posBucket.size());
+        int floor = 0;
+
+        for (int i = 0; i < posList.size(); i++) {
+            floor = (int)Math.floor(posList.get(i)/divider);
+            posBucket.get(floor).add(posList.get(i));
+        }
+
+        for (int i = 0; i < posBucket.size(); i++) {
+            if (posBucket.get(i).size() != 0) {
+                insertSort(posBucket.get(i));
+            }
+        }
+    }
+
+    public static void sortNeg(ArrayList<ArrayList<Double>> negBucket, ArrayList<Double> negList) {
+        for (int i = 0; i < negList.size(); i++) {
+            negList.set(i, negList.get(i) * -1);
+        }
+        sortPos(negBucket, negList);
+        // Sorted like a positive list. Need to start from the end, and switch
+        // with an elem in the beginning. Wait, no I dont. Times everything by
+        // -1, then just insert or print the list from the back. New double arrayList?
+        for (int i = 0; i < negBucket.size(); i++) {
+            if (negBucket.get(i).size() != 0) {
+                for (int j = 0; j < negBucket.get(i).size(); j++) {
+                    negBucket.get(i).set(j, negBucket.get(i).get(j) * -1);
+                }
+            }
+        }
+        // "Sorted" like a positive list. Times everything by -1
+
+    }
+
+    public static double calculateMax(ArrayList<Double> list) {
         double theMax = 0;
 
-        for (int i = 0; i < inputData.size(); i++) {
-            if (inputData.get(i) > theMax) {
-                theMax = inputData.get(i).doubleValue();
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i) > theMax) {
+                theMax = list.get(i).doubleValue();
             }
         }
 
