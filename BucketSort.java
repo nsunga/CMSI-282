@@ -5,18 +5,21 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
+/**
+ * Purpose: BucketSort for doubles. Run like this -> java BucketSort < file.txt
+ * The file must have only one double per line like so:
+ *      1.02
+ *      -9.002
+ *
+ * Input: The file of doubles
+ *
+ * Output: The input that is now sorted
+ *
+ * @author NICHOLAS SUNGA
+ */
 public class BucketSort {
-    /*Make BucketSort.java, a program that takes an arbitrary file of doubles
-    from standard input, then outputs them in ascending order, using the
-    algorithm discussed in class. Your program should read the data into a
-    java.util.ArrayList; use small ArrayLists (rather than linked lists) for
-    the buckets; and merge the buckets back into the original ArrayList before
-    outputting the results. A typical invocation of your program might look
-    like this: java BucketSort < FileFullOfDoubles*/
-
     public static void main(String[] args) {
-        // TODO: Implement negative doubles and small values ie -> 0.1
-        // I think its complete!
+        // positive and negative buckets
         ArrayList<ArrayList<Double>> posBucket = new ArrayList<ArrayList<Double>>();
         ArrayList<ArrayList<Double>> negBucket = new ArrayList<ArrayList<Double>>();
 
@@ -37,10 +40,21 @@ public class BucketSort {
         sort(posBucket, negBucket, inputData);
     }
 
+    /**
+     * Instantiate the right amount of pos and neg buckets, sort them, and
+     * put them back into the original ArrayList. Also prints out the ArrayList
+     * in ascending order
+     *
+     * @param posBucket buckets for positive and zero nums
+     * @param negBucket buckets for negative nums
+     * @param inputData the nums to be sorted
+     * @return none
+     */
     public static void sort(ArrayList<ArrayList<Double>> posBucket, ArrayList<ArrayList<Double>> negBucket, ArrayList<Double> inputData) {
         ArrayList<Double> negList = new ArrayList<Double>();
         ArrayList<Double> posList = new ArrayList<Double>(); // zero in here too
 
+        // Separate the input into a positive list and a negative list
         for (int i = 0; i < inputData.size(); i++) {
             if (inputData.get(i) < 0) {
                 negList.add(inputData.get(i));
@@ -57,38 +71,42 @@ public class BucketSort {
             posBucket.add(new ArrayList<Double>());
         }
 
+        // put the values in their buckets
         sortPos(posBucket, posList);
         sortNeg(negBucket, negList);
 
+        int inputIndex = 0;
 
-        ArrayList<Double> finalArray = new ArrayList<Double>();
-
-        // TODO: negatives are sorted but from the back. Insert them into the
-        // original list. Positives are sorted. insert them into the original
-        // list. I think its complete!
-
-        int negIndex = 0;
+        // put the negative values back into the original list
         for (int i = negBucket.size() - 1; i > -1; i--) {
             if (negBucket.get(i).size() != 0) {
                 for (int j = negBucket.get(i).size() - 1; j > -1; j--) {
-                    finalArray.add(negBucket.get(i).get(j));
-                    inputData.set(negIndex++, negBucket.get(i).get(j));
+                    inputData.set(inputIndex++, negBucket.get(i).get(j));
                 }
             }
         }
 
+        // put the positive values back into the original list
         for (int i = 0; i < posBucket.size(); i++) {
             if (posBucket.get(i).size() != 0) {
                 for (int j = 0; j < posBucket.get(i).size(); j++) {
-                    inputData.set(negIndex++, posBucket.get(i).get(j));
+                    inputData.set(inputIndex++, posBucket.get(i).get(j));
                 }
             }
         }
 
-        System.out.println("Size: " + inputData.size());
+        // Print out the array in ascending order
         System.out.println(Arrays.toString(inputData.toArray()));
     }
 
+    /**
+     * Determine which bucket the positive or zero nums should be
+     * and calls insertion sort on every non-empty bucket
+     *
+     * @param posBucket buckets for positive and zero nums
+     * @param posList positive or zero nums from the original input
+     * @return none
+     */
     public static void sortPos(ArrayList<ArrayList<Double>> posBucket, ArrayList<Double> posList) {
         double theMax = calculateMax(posList);
         double integerPart = Math.floor(theMax);
@@ -107,14 +125,22 @@ public class BucketSort {
         }
     }
 
+    /**
+     * Determine which bucket the negative nums should be
+     * and calls sortPos
+     *
+     * @param negBucket buckets for negative nums
+     * @param negList negative nums from the original input
+     * @return none
+     */
     public static void sortNeg(ArrayList<ArrayList<Double>> negBucket, ArrayList<Double> negList) {
+        // multiply by negative one so I can just call sortPos() instead
         for (int i = 0; i < negList.size(); i++) {
             negList.set(i, negList.get(i) * -1);
         }
         sortPos(negBucket, negList);
-        // Sorted like a positive list. Need to start from the end, and switch
-        // with an elem in the beginning. Wait, no I dont. Times everything by
-        // -1, then just insert or print the list from the back. New double arrayList?
+
+        // revert the numbers back to negative
         for (int i = 0; i < negBucket.size(); i++) {
             if (negBucket.get(i).size() != 0) {
                 for (int j = 0; j < negBucket.get(i).size(); j++) {
@@ -122,10 +148,14 @@ public class BucketSort {
                 }
             }
         }
-        // "Sorted" like a positive list. Times everything by -1
-
     }
 
+    /**
+     * Determine the max value of the ArrayList
+     *
+     * @param list the input list
+     * @return double - the max value
+     */
     public static double calculateMax(ArrayList<Double> list) {
         double theMax = 0;
 
@@ -138,6 +168,12 @@ public class BucketSort {
         return theMax;
     }
 
+    /**
+     * Basic insertion sort
+     *
+     * @param arr should be a non empty bucket
+     * @return none
+     */
     public static void insertSort(ArrayList<Double> arr) {
         double temp;
 
