@@ -3,7 +3,10 @@ import java.lang.Math;
 /**
  * Purpose: MonteCarlo simulation of Crown and Anchor.
  * User inputs the number of simulations like so -> java CrownAndAnchor posInt
- * Bet can be arbitrary positive int
+ * posInt -> number of games to be played. Should be huge for good sample
+ *
+ * Hard coded the bets to be between 1 - 1000 b/c as long as it's positive, it
+ * does not matter.
  *
  * Input: Number of simulations
  *
@@ -17,7 +20,7 @@ public class CrownAndAnchor {
     public static void main(String[] args) {
         int numberOfGames = Integer.valueOf(Integer.parseInt(args[0]));
 
-        int bet = (int) Math.floor((Math.random() * 100)) + 1;
+        int bet = (int) Math.floor((Math.random() * 1000)) + 1;
         int costOfBets = 0;
         int[] diceThrow = new int[3];
         int winningSide = 0;
@@ -34,6 +37,7 @@ public class CrownAndAnchor {
         }
 
         double percentage = ((double)balance / (double)costOfBets) * 100;
+        System.out.print("Percent of what the player keeps in relation to how much they bet: ");
         System.out.println(percentage);
     }
 
